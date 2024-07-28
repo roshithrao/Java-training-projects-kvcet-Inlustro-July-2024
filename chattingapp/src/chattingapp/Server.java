@@ -1,5 +1,6 @@
 package chattingapp;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
@@ -8,16 +9,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 public class Server extends JFrame implements ActionListener {
 
+	JTextField text;
+	JPanel p2;
+	static Box vertical = Box.createVerticalBox();
+	
 	Server()
 	{
 		this.setLayout(null); //to set frame layout user defined
@@ -95,12 +105,12 @@ public class Server extends JFrame implements ActionListener {
 		
 		//creating another panel for chat
 		
-		JPanel p2 = new JPanel();
+		p2 = new JPanel();
 		p2.setBounds(5, 75, 440, 570);
 		this.add(p2);
 		
 		//panel for typing chat text
-		JTextField text = new JTextField();
+		text = new JTextField();
 		text.setBounds(5, 655, 310, 40);
 		text.setFont(new Font("SAN_SARIF", Font.PLAIN, 16));
 		this.add(text);
@@ -111,6 +121,7 @@ public class Server extends JFrame implements ActionListener {
 		send.setBackground(new Color(7, 94, 84));
 		send.setForeground(Color.WHITE);
 		send.setFont(new Font("SAN_SARIF", Font.PLAIN, 16));
+		send.addActionListener(this);
 		this.add(send);
 		
 		//setting main frame
@@ -124,9 +135,65 @@ public class Server extends JFrame implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		String out = text.getText(); //to get chat text
+
+		//System.out.println(out);
+		
+		//JLabel output = new JLabel(out);
+		
+		//JPanel p3 = new JPanel();
+		
+        JPanel p3 = formatLabel(out); //function to format the chat label
+        
+        //p3.add(output);
+
+        p2.setLayout(new BorderLayout()); //to create a new boarder on 2nd panel
+
+        //right side panel creation
+        JPanel right = new JPanel(new BorderLayout()); //creates a right panel by creating a new border
+        right.add(p3, BorderLayout.LINE_END); //until the line ends
+        //creating vertical boxes between each message
+        vertical.add(right); 
+        vertical.add(Box.createVerticalStrut(15));
+
+        //adding the vertical panel to main panel p2 at page starting
+        p2.add(vertical, BorderLayout.PAGE_START);
+        
+        //repaints on the panel
+        this.repaint();
+        this.invalidate();
+        this.validate();
+        text.setText(" ");
 		
 	}
+	
+	public static JPanel formatLabel(String out) {
+        //creation of message panel p3      
+		JPanel panel = new JPanel();
+		//setting the layout with box layout, one after the another it should come, so y-axis
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        
+        //message text width,font,background, opaque, border
+        JLabel output = new JLabel("<html><p style=\"width: 150px\">" + out + "</p></html>");
+        output.setFont(new Font("Tahoma", Font.PLAIN, 16));
+        output.setBackground(new Color(37, 211, 102));
+        output.setOpaque(true);
+        output.setBorder(new EmptyBorder(15, 15, 15, 50));
+        
+        panel.add(output);
+        
+        //to get system time for each message below
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        
+        JLabel time = new JLabel();
+        time.setText(sdf.format(cal.getTime()));
+        
+        panel.add(time);
+        
+        return panel;
+    }
+	
 	
 	public static void main(String[] args) {
 		new Server();
