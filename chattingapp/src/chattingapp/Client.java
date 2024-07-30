@@ -12,8 +12,8 @@ import java.awt.event.MouseEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -27,15 +27,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-public class Server implements ActionListener {
+public class Client implements ActionListener {
 
 	JTextField text;
 	static JPanel p2;
 	static Box vertical = Box.createVerticalBox();
-	static JFrame frame = new JFrame();
 	static DataOutputStream dout;
+	static JFrame frame = new JFrame();
 	
-	Server()
+	Client()
 	{
 		frame.setLayout(null); //to set frame layout user defined
 		
@@ -52,7 +52,7 @@ public class Server implements ActionListener {
 		ImageIcon i3 = new ImageIcon(i2); //need to convert to image icon to put on the label
 		JLabel back = new JLabel(i3);
 		back.setBounds(5, 20, 25, 25); //sets size of arrow image
-		p1.add(back); //adding image to panel1
+		p1.add(back); //adding back arrow image to panel1
 		
 		//For mouse click on arrow to exit
 		back.addMouseListener(new MouseAdapter() {
@@ -87,7 +87,7 @@ public class Server implements ActionListener {
 		call.setBounds(360, 20, 35, 30); //setting label size on panel
 		p1.add(call); //adding image to panel1
 		
-		//for image image on panel
+		//for more options image on panel
 		ImageIcon i13 = new ImageIcon(ClassLoader.getSystemResource("icons/3icon.png"));
 		Image i14 = i13.getImage().getScaledInstance(10, 25, Image.SCALE_DEFAULT);
 		ImageIcon i15 = new ImageIcon(i14); //need to convert to image icon to put on the label
@@ -98,7 +98,7 @@ public class Server implements ActionListener {
 		//jLabel helps in mainly writing on the frame
 		
 		//Writing your name on panel
-		JLabel name = new JLabel("Roshith");
+		JLabel name = new JLabel("James");
 		name.setBounds(110, 15, 100, 18); //Setting label size on panel
 		name.setForeground(Color.WHITE);
 		name.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
@@ -133,18 +133,16 @@ public class Server implements ActionListener {
 		
 		//setting main frame
 		frame.setSize(450,700);
-		frame.setLocation(200,50); //to set top and side distance
+		frame.setLocation(800,50); //to set top and side distance
 		frame.getContentPane().setBackground(Color.WHITE); //to set main frame background
 		frame.setUndecorated(true);
 		frame.setVisible(true);
-		
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
-    try {
-	    	String out = text.getText();
+		try {
+		String out = text.getText();
 
 		//JLabel output = new JLabel(out);
 		
@@ -163,16 +161,15 @@ public class Server implements ActionListener {
 
         p2.add(vertical, BorderLayout.PAGE_START);
         
-        dout.writeUTF(out); 
+        dout.writeUTF(out);
         frame.repaint();
         frame.invalidate();
         frame.validate();
         text.setText(" ");
+		}catch(Exception e1) {
+			e1.printStackTrace();
+		}
    }
-    catch (IOException e1) {
-		e1.printStackTrace();
-	}
-  }
 	
 	public static JPanel formatLabel(String out) {
         JPanel panel = new JPanel();
@@ -198,41 +195,33 @@ public class Server implements ActionListener {
     }
 	
 	public static void main(String[] args) {
-		new Server();
-		
+		new Client();
 		try {
-			ServerSocket skt = new ServerSocket(5000);
-			while(true)
-			{
-				Socket s = skt.accept();
-				DataInputStream din = new DataInputStream(s.getInputStream());
-			    dout = new DataOutputStream(s.getOutputStream());
-			    
-				while(true) {
-					p2.setLayout(new BorderLayout());
-			        String msg = din.readUTF();
-			        JPanel panel = formatLabel(msg);
-			        
-			        JPanel left = new JPanel(new BorderLayout());
-			        left.add(panel, BorderLayout.LINE_START);
-			        vertical.add(left);
-			        
-			      vertical.add(Box.createVerticalStrut(15));
+			Socket s = new Socket("127.0.0.1", 5000);
+			DataInputStream din = new DataInputStream(s.getInputStream());
+		    dout = new DataOutputStream(s.getOutputStream());
+		    while(true) {
+		    	p2.setLayout(new BorderLayout());
+		        String msg = din.readUTF();
+		        JPanel panel = formatLabel(msg);
+		        
+		        JPanel left = new JPanel(new BorderLayout());
+		        left.add(panel, BorderLayout.LINE_START);
+		        vertical.add(left);
+		        
+		        vertical.add(Box.createVerticalStrut(15));
 
-			      p2.add(vertical, BorderLayout.PAGE_START);
-			        
-			      //directly with frame you cannot call from static method so create object of Jframe class to
-			      // use the methods instead of extends
-			        frame.validate();
-			        
-				}
+		        p2.add(vertical, BorderLayout.PAGE_START);
+		        
+		      //directly with frame you cannot call from static method so create object of Jframe class to
+		      // use the methods instead of extends
+		        frame.validate();	        
 			}
-		}
-		catch(Exception e)
-		{
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-		
 	
 }
