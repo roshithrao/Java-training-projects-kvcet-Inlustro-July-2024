@@ -5,7 +5,9 @@ import jakarta.servlet.GenericServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.annotation.WebServlet;
 
+@WebServlet("/test2")
 public class MyServlet2 extends GenericServlet {
 
 	@Override
